@@ -1,4 +1,5 @@
 {
+    "project_id": "citaMedica",
     "SUPABASE_URL": "https://your-project.supabase.co",
     "SUPABASE_ANON_KEY": "public-anon-key-placeholder",
     "SUPABASE_SERVICE_KEY": "service-role-key-placeholder"

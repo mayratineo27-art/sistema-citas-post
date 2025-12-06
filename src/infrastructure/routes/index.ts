@@ -1,22 +1,20 @@
 import { Router } from 'express';
-// In a real app, we would import controllers here
-// import { PatientController } from './controllers/PatientController';
+import { AuthController } from '../controllers/AuthController';
+import { UserRepository } from '../supabase/UserRepository';
 
 const router = Router();
 
-// Placeholder routes
-router.get('/patients', (req, res) => {
-    res.json({ message: "List patients" });
-});
+// Dependencies
+const userRepository = new UserRepository();
+const authController = new AuthController(userRepository);
 
-router.post('/patients', (req, res) => {
-    // const controller = new PatientController();
-    // controller.create(req, res);
-    res.json({ message: "Create patient" });
-});
+// Auth Routes
+router.post('/auth/login', (req, res) => authController.login(req, res));
 
-router.post('/appointments', (req, res) => {
-    res.json({ message: "Schedule appointment" });
-});
+// Patient Routes (Placeholder)
+router.get('/patients', (req, res) => { res.json({ msg: "List patients" }) });
+
+// Doctor Routes (Placeholder)
+router.get('/doctors', (req, res) => { res.json({ msg: "List doctors" }) });
 
 export default router;

@@ -1,6 +1,7 @@
 export class Doctor {
     constructor(
         public readonly id: string,
+        public userId: string,
         public firstName: string,
         public lastName: string,
         public cmp: string, // Colegio Médico del Perú
