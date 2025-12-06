@@ -67,6 +67,21 @@ El proyecto sigue una estricta separación de responsabilidades:
 *   [Requisitos Funcionales](./docs/functional_requirements.md)
 *   [Backlog & Roadmap](./docs/backlog.md)
 
+## ⚡ Supabase Setup
+
+1.  **Create Project**: Go to [app.supabase.io](https://app.supabase.io) and create a new project.
+2.  **Environment Variables**:
+    *   Copy credentials from Project Settings > API.
+    *   Paste them into `.env` (copy from `.env.example`).
+    *   **Security Note**: Never commit your `service_role` key. Use it only in secure backend contexts.
+3.  **Database Migration**:
+    *   Go to the SQL Editor in Supabase.
+    *   Run the contents of `infra/sql/migrations/01_schema_init.sql`.
+    *   Run the contents of `infra/sql/migrations/02_security_rls.sql`.
+4.  **Seeding Data**:
+    *   Run the contents of `infra/sql/seeders/01_base_seeds.sql` to populate initial data.
+    *   This will create a default admin user, doctors, and specialties.
+
 ## 🤝 Contribución
 
 1.  Hacer fork del repositorio.
