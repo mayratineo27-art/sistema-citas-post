@@ -1,36 +1,42 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
-import dotenv from 'dotenv';
 
-dotenv.config();
-
-const supabaseUrl = process.env.SUPABASE_URL || '';
-const supabaseAnonKey = process.env.SUPABASE_ANON_KEY || '';
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY || '';
+// Access environment variables securely for Vite
+// NOTE: Vite requires variables to start with VITE_ to be exposed to the client
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || '';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Supabase credentials missing in environment variables');
+    console.warn('⚠️ [Supabase] Credentials missing! Check your .env file and ensure variables start with VITE_');
 }
 
-// Client for client-side operations (safe for public)
-export const supabaseClient: SupabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+// Create a single instance of the client
+// We use a fallback if credentials are missing to prevent immediate crash, though queries will fail.
+export const supabaseClient: SupabaseClient = createClient(
+    supabaseUrl || 'https://placeholder.supabase.co',
+    supabaseAnonKey || 'placeholder-key'
+);
 
-// Client for server-side admin operations (bypasses RLS) - USE WITH CAUTION
-export const supabaseAdmin: SupabaseClient = createClient(supabaseUrl, supabaseServiceKey || supabaseAnonKey);
-
+// Helpers to access specific services
 export const getAuth = () => supabaseClient.auth;
 export const getStorage = () => supabaseClient.storage;
 
-// Helper to check connection
+// Connection check helper
 export const checkSupabaseConnection = async (): Promise<boolean> => {
     try {
-        const { error } = await supabaseClient.from('users').select('count', { count: 'exact', head: true });
-        if (error && error.code !== 'PGRST116') { // Ignore "relation not found" if tables aren't created yet
-            console.error('Supabase connection error:', error.message);
+        if (!supabaseUrl || !supabaseAnonKey) return false;
+        // Simple lightweight check (e.g. check if we can reach the server)
+        const { error } = await supabaseClient.from('appointments').select('count', { count: 'exact', head: true });
+
+        // It's considered a success if we get a response, even if it's "table not found" or actual data
+        // We only care if the network/client configuration fails
+        if (error && error.code === 'PGRST116') return true; // Table missing but connected
+        if (error) {
+            console.error('[Supabase] Connection check error:', error.message);
             return false;
         }
         return true;
     } catch (e) {
-        console.error('Supabase connection exception:', e);
+        console.error('[Supabase] Connection check exception:', e);
         return false;
     }
 };

@@ -4,7 +4,8 @@
     "description": "Sistema de Gestión de Citas Médicas",
     "main": "dist/infrastructure/server.js",
     "scripts": {
-        "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+        "dev": "npm run dev:client",
+        "dev:full": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
         "dev:server": "nodemon src/infrastructure/server.ts",
         "dev:client": "vite",
         "build": "npm run build:client && npm run build:server",
