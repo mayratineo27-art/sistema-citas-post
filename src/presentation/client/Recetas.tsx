@@ -131,10 +131,10 @@ export const Recetas: React.FC = () => {
 
 
             {/* RIGHT MAIN PANEL: DOCUMENT PREVIEW */}
-            <div className="lg:w-2/3 flex flex-col h-full glass-card rounded-2xl p-1 md:p-6 overflow-hidden relative">
+            <div className="lg:w-2/3 flex flex-col h-full glass-card rounded-2xl p-1 md:p-6 overflow-hidden relative bg-slate-100/50">
                 {selectedReceta ? (
                     <div className="h-full overflow-y-auto pr-2 custom-scrollbar relative z-10">
-                        <div className="bg-white text-slate-800 shadow-xl shadow-slate-200/50 relative overflow-hidden flex flex-col min-h-[800px] w-full max-w-3xl mx-auto rounded-xl">
+                        <div className="bg-white text-slate-800 shadow-2xl shadow-slate-900/10 relative overflow-hidden flex flex-col min-h-[800px] w-full max-w-3xl mx-auto rounded-sm border border-slate-200" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
 
                             {/* Medical Header */}
                             <div className="bg-gradient-to-r from-teal-500 to-teal-600 h-28 relative flex items-center justify-between px-8 shrink-0 overflow-hidden">

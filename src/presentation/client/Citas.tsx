@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { supabaseClient } from '../../infrastructure/db/client';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
-import { Calendar, Clock, User, XCircle, PlusCircle, MapPin, Activity, ChevronRight, Filter } from 'lucide-react';
+import { Calendar, Clock, User, XCircle, PlusCircle, MapPin, Activity, ChevronRight, Filter, CheckCircle } from 'lucide-react';
 import { AppointmentStatus } from '../../domain/entities/Appointment';
 import { Link } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 
 // --- Interfaces ---
 interface AppointmentView {
@@ -18,6 +19,8 @@ interface AppointmentView {
 
 export const Citas: React.FC = () => {
     // State
+    const [searchParams, setSearchParams] = useSearchParams();
+    const showSuccessBanner = searchParams.get('success') === 'true';
     const [appointments, setAppointments] = useState<AppointmentView[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,7 +29,21 @@ export const Citas: React.FC = () => {
     // Fetch Logic
     useEffect(() => {
         fetchAppointments();
+
+        // Clear success param after 5 seconds
+        if (showSuccessBanner) {
+            setTimeout(() => {
+                setSearchParams({});
+            }, 5000);
+        }
     }, []);
+
+    // Re-fetch when success banner appears (new appointment created)
+    useEffect(() => {
+        if (showSuccessBanner) {
+            fetchAppointments();
+        }
+    }, [showSuccessBanner]);
 
     const fetchAppointments = async () => {
         setLoading(true);
@@ -106,12 +123,44 @@ export const Citas: React.FC = () => {
         }
     };
 
-    const upcomingAppointments = appointments.filter(a => new Date(a.date_time) > new Date() && a.status !== AppointmentStatus.CANCELLED);
-    const historyAppointments = appointments.filter(a => new Date(a.date_time) <= new Date() || a.status === AppointmentStatus.CANCELLED);
+    // Use start of today for comparison (not current time)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const upcomingAppointments = appointments.filter(a => {
+        const apptDate = new Date(a.date_time);
+        return apptDate >= today && a.status !== AppointmentStatus.CANCELLED;
+    });
+
+    const historyAppointments = appointments.filter(a => {
+        const apptDate = new Date(a.date_time);
+        return apptDate < today || a.status === AppointmentStatus.CANCELLED;
+    });
     const displayedAppointments = activeTab === 'upcoming' ? upcomingAppointments : historyAppointments;
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* SUCCESS BANNER */}
+            {showSuccessBanner && (
+                <div className="bg-gradient-to-r from-teal-500 to-emerald-500 rounded-[2rem] p-6 shadow-2xl shadow-teal-500/20 text-white animate-in slide-in-from-top-4 duration-500">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+                            <CheckCircle size={28} className="text-white" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="text-lg font-black mb-1">¡Cita Registrada Exitosamente!</h3>
+                            <p className="text-teal-50 text-sm">Tu reserva ha sido confirmada. Revisa los detalles a continuación.</p>
+                        </div>
+                        <button
+                            onClick={() => setSearchParams({})}
+                            className="text-white/60 hover:text-white transition-colors"
+                        >
+                            <XCircle size={20} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* 1. Header Section */}
             <div className="flex flex-col md:flex-row justify-between items-end md:items-center gap-4">
                 <div>
@@ -178,7 +227,7 @@ export const Citas: React.FC = () => {
                             {/* Status Badge */}
                             <div className={`absolute top-6 right-6 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase items-center gap-1.5 flex ${getStatusStyles(appt.status)}`}>
                                 <div className="w-1.5 h-1.5 rounded-full bg-current animate-pulse"></div>
-                                {appt.status}
+                                {appt.status === AppointmentStatus.PENDING ? 'POR ASISTIR' : appt.status}
                             </div>
 
                             <div className="flex items-start gap-6">

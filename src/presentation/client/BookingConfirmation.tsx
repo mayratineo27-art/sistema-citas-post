@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
-import { ChevronLeft, User, Calendar, Clock, Loader2, MapPin, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { ChevronLeft, User, Calendar, Clock, Loader2, MapPin, Shield, CheckCircle, AlertCircle, PartyPopper } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { supabaseClient } from '../../infrastructure/db/client';
 
@@ -30,6 +30,8 @@ export const BookingConfirmation: React.FC = () => {
 
     const [loading, setLoading] = useState(false);
     const [patientId, setPatientId] = useState<string | null>(null);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [ticketNumber, setTicketNumber] = useState<string>('');
 
     const [patient, setPatient] = useState({
         firstName: 'Cargando...',
@@ -148,8 +150,15 @@ export const BookingConfirmation: React.FC = () => {
 
             console.log("✅ Cita insertada correctamente!");
 
-            // Success & Redirect
-            navigate('/cliente/citas?success=true');
+            // Generate ticket number (for UI feedback)
+            const ticketNum = `T${Date.now().toString().slice(-8)}`;
+            setTicketNumber(ticketNum);
+            setShowSuccess(true);
+
+            // Redirect after showing success (2.5 seconds)
+            setTimeout(() => {
+                navigate('/cliente/citas?success=true');
+            }, 2500);
 
         } catch (error: any) {
             console.error("🚨 Booking Critical Error:", error);
@@ -161,6 +170,27 @@ export const BookingConfirmation: React.FC = () => {
 
     return (
         <div className="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-24">
+
+            {/* SUCCESS OVERLAY */}
+            {showSuccess && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md animate-in fade-in duration-300">
+                    <div className="bg-white rounded-[2.5rem] p-12 max-w-md shadow-2xl shadow-teal-500/20 text-center animate-in zoom-in-95 duration-500">
+                        <div className="w-24 h-24 bg-gradient-to-br from-teal-400 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-bounce">
+                            <PartyPopper size={48} className="text-white" />
+                        </div>
+                        <h2 className="text-3xl font-black text-slate-900 mb-3">¡Reserva Confirmada!</h2>
+                        <p className="text-slate-600 mb-6">Tu cita médica ha sido registrada exitosamente en el sistema.</p>
+                        <div className="bg-teal-50 border-2 border-teal-200 rounded-2xl p-4 mb-6">
+                            <p className="text-xs font-bold text-teal-600 uppercase tracking-wider mb-1">Número de Ticket</p>
+                            <p className="text-2xl font-black text-teal-700">{ticketNumber}</p>
+                        </div>
+                        <div className="flex items-center justify-center gap-2 text-sm text-slate-400">
+                            <span>Redirigiendo a Mis Visitas</span>
+                            <Loader2 size={16} className="animate-spin" />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* HEADER MOBILE */}
             <div className="lg:hidden flex items-center gap-4 mb-4">

@@ -16,7 +16,7 @@ export const BookingSlots: React.FC = () => {
         // Navigate to confirmation page with params
         const queryParams = new URLSearchParams({
             specialty: especialidad || '',
-            date: '2025-12-06', // Hardcoded for this demo, would be selected date
+            date: new Date().toISOString().split('T')[0], // Dynamic Date (Today)
             time: selectedSlot || ''
         }).toString();
 
@@ -55,7 +55,9 @@ export const BookingSlots: React.FC = () => {
                         <Calendar size={28} />
                     </div>
                     <div>
-                        <p className="font-black text-slate-900 text-xl tracking-tight">Hoy, 6 de Diciembre</p>
+                        <p className="font-black text-slate-900 text-xl tracking-tight capitalize">
+                            Hoy, {new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'long' })}
+                        </p>
                         <div className="flex items-center gap-2 mt-1">
                             <span className="w-2.5 h-2.5 bg-teal-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.6)]"></span>
                             <p className="text-xs text-slate-500 font-bold uppercase tracking-wide">Turnos Disponibles</p>
