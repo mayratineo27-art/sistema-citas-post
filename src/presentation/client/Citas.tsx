@@ -21,7 +21,7 @@ const MOCK_APPOINTMENTS: AppointmentView[] = [
     {
         id: '1',
         date_time: new Date(new Date().setDate(new Date().getDate() + 1)).toISOString(), // Mañana
-        status: AppointmentStatus.SCHEDULED,
+        status: AppointmentStatus.PENDING,
         reason: 'Chequeo General Mensual',
         doctorName: 'Dr. Juan Pérez',
         specialty: 'Medicina General'
@@ -37,7 +37,7 @@ const MOCK_APPOINTMENTS: AppointmentView[] = [
     {
         id: '3',
         date_time: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(), // En 5 días
-        status: AppointmentStatus.SCHEDULED,
+        status: AppointmentStatus.PENDING,
         reason: 'Revisión de Análisis de Sangre',
         doctorName: 'Dr. Carlos Ruiz',
         specialty: 'Cardiología'
@@ -127,10 +127,14 @@ export const Citas: React.FC = () => {
         }
     };
 
+    // --- Modal State ---
+    const [selectedAppointment, setSelectedAppointment] = useState<AppointmentView | null>(null);
+
     // --- Helpers de Estilo ---
     const getStatusStyles = (status: AppointmentStatus) => {
         switch (status) {
-            case AppointmentStatus.SCHEDULED:
+            case AppointmentStatus.PENDING:
+            case AppointmentStatus.CONFIRMED:
                 return 'bg-green-100 text-green-700 border-green-200';
             case AppointmentStatus.COMPLETED:
                 return 'bg-blue-100 text-blue-700 border-blue-200';
@@ -143,7 +147,8 @@ export const Citas: React.FC = () => {
 
     const getStatusLabel = (status: AppointmentStatus) => {
         switch (status) {
-            case AppointmentStatus.SCHEDULED: return 'PROGRAMADA';
+            case AppointmentStatus.PENDING: return 'PENDIENTE';
+            case AppointmentStatus.CONFIRMED: return 'CONFIRMADA';
             case AppointmentStatus.COMPLETED: return 'COMPLETADA';
             case AppointmentStatus.CANCELLED: return 'CANCELADA';
             default: return status;
@@ -151,8 +156,7 @@ export const Citas: React.FC = () => {
     };
 
     return (
-        // Contenedor Principal con fondo blanco y padding garantizado
-        <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-200 max-w-5xl mx-auto my-6">
+        <div className="p-6 bg-white rounded-xl shadow-lg border border-gray-200 max-w-5xl mx-auto my-6 relative">
 
             {/* Cabecera */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-gray-100 pb-4">
@@ -178,7 +182,6 @@ export const Citas: React.FC = () => {
                 <div className="space-y-4">
                     {appointments.length > 0 ? (
                         appointments.map((appt) => (
-                            // Tarjeta de Cita Individual
                             <div key={appt.id} className="flex flex-col md:flex-row gap-4 p-5 rounded-lg border border-gray-200 hover:shadow-md transition-all bg-gray-50/50">
                                 {/* Icono / Fecha */}
                                 <div className="hidden md:flex flex-col items-center justify-center p-4 bg-white rounded-lg border border-gray-100 shadow-sm w-24 shrink-0">
@@ -220,8 +223,8 @@ export const Citas: React.FC = () => {
                                 </div>
 
                                 {/* Acciones */}
-                                <div className="flex items-center md:justify-end">
-                                    {appt.status === AppointmentStatus.SCHEDULED && (
+                                <div className="flex items-center gap-2 md:justify-end">
+                                    {(appt.status === AppointmentStatus.PENDING || appt.status === AppointmentStatus.CONFIRMED) && (
                                         <Button
                                             variant="danger"
                                             className="w-full md:w-auto text-sm"
@@ -231,16 +234,17 @@ export const Citas: React.FC = () => {
                                             Cancelar
                                         </Button>
                                     )}
-                                    {appt.status !== AppointmentStatus.SCHEDULED && (
-                                        <Button variant="outline" className="w-full md:w-auto text-sm opacity-50 cursor-not-allowed">
-                                            Ver Detalles
-                                        </Button>
-                                    )}
+                                    <Button
+                                        variant="outline"
+                                        className="w-full md:w-auto text-sm hover:bg-sky-50 text-sky-600 border-sky-200"
+                                        onClick={() => setSelectedAppointment(appt)}
+                                    >
+                                        Ver Detalles
+                                    </Button>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        // Empty State Visible
                         <div className="text-center py-16 bg-gray-50 rounded-xl border-2 border-dashed border-gray-300">
                             <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
                             <h3 className="text-xl font-bold text-gray-800">No hay citas disponibles</h3>
@@ -250,6 +254,50 @@ export const Citas: React.FC = () => {
                             </Button>
                         </div>
                     )}
+                </div>
+            )}
+
+            {/* Modal de Detalles */}
+            {selectedAppointment && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                    <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden border border-gray-100">
+                        <div className="bg-sky-600 p-6 text-white text-center">
+                            <h3 className="text-xl font-bold">Detalles de la Cita</h3>
+                            <p className="text-sky-100 text-sm opacity-90">ID: {selectedAppointment.id.slice(0, 8)}...</p>
+                        </div>
+                        <div className="p-6 space-y-4">
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-500 font-medium">Fecha</span>
+                                <span className="text-gray-900 font-bold">{new Date(selectedAppointment.date_time).toLocaleDateString()}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-500 font-medium">Hora</span>
+                                <span className="text-gray-900 font-bold">{new Date(selectedAppointment.date_time).toLocaleTimeString()}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-500 font-medium">Médico</span>
+                                <span className="text-gray-900 font-bold">{selectedAppointment.doctorName}</span>
+                            </div>
+                            <div className="flex justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-500 font-medium">Especialidad</span>
+                                <span className="text-gray-900 font-bold">{selectedAppointment.specialty}</span>
+                            </div>
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                                <span className="block text-gray-500 text-xs font-bold uppercase mb-1">Motivo / Síntomas</span>
+                                <p className="text-gray-700 italic">"{selectedAppointment.reason}"</p>
+                            </div>
+                            <div className="pt-2">
+                                <span className={`block text-center py-2 px-4 rounded-lg font-bold text-sm ${getStatusStyles(selectedAppointment.status)}`}>
+                                    ESTADO: {getStatusLabel(selectedAppointment.status)}
+                                </span>
+                            </div>
+                        </div>
+                        <div className="p-4 bg-gray-50 flex justify-end">
+                            <Button variant="primary" onClick={() => setSelectedAppointment(null)}>
+                                Cerrar
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             )}
         </div>

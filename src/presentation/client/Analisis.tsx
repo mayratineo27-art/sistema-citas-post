@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { FileBarChart, CheckCircle, Clock, FileText, Download, AlertCircle, TestTube, Lock, Calendar, ChevronRight } from 'lucide-react';
+import { CheckCircle, Download, TestTube, Calendar } from 'lucide-react';
 import { Card } from '../components/ui/Card';
 import { Button } from '../components/ui/Button';
 import { supabaseClient } from '../../infrastructure/db/client';
@@ -10,8 +10,36 @@ export const Analisis: React.FC = () => {
     const navigate = useNavigate();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [bookingOrder, setBookingOrder] = useState<string | null>(null); // ID of order being booked
+    const [bookingOrder, setBookingOrder] = useState<string | null>(null);
     const [patientName, setPatientName] = useState('');
+
+    // --- NEW STATE: Catalog & Booking ---
+    const [availableExams] = useState({
+        "Hematología": [
+            { id: 'HEM-001', name: 'Hemograma Completo', desc: 'Recuento de células sanguíneas' },
+            { id: 'HEM-002', name: 'Grupo Sanguíneo y Factor Rh', desc: 'Tipificación de sangre' },
+            { id: 'HEM-003', name: 'Velocidad de Sedimentación', desc: 'Marcador de inflamación' }
+        ],
+        "Bioquímica": [
+            { id: 'BIO-001', name: 'Glucosa en Ayunas', desc: 'Descarte de diabetes' },
+            { id: 'BIO-002', name: 'Perfil Lipídico', desc: 'Colesterol, HDL, LDL, Triglicéridos' },
+            { id: 'BIO-003', name: 'Urea y Creatinina', desc: 'Función renal' },
+            { id: 'BIO-004', name: 'Perfil Hepático', desc: 'Función del hígado' }
+        ],
+        "Inmunología": [
+            { id: 'INM-001', name: 'Prueba Rápida VIH', desc: 'Descarte de VIH' },
+            { id: 'INM-002', name: 'Prueba Rápida Sífilis (RPR)', desc: 'Descarte de sífilis' },
+            { id: 'INM-003', name: 'Antígeno de Superficie (HBsAg)', desc: 'Hepatitis B' }
+        ],
+        "Microbiología": [
+            { id: 'MIC-001', name: 'Examen Completo de Orina', desc: 'Infección urinaria' },
+            { id: 'MIC-002', name: 'Parasitológico Seriado', desc: 'Heces (3 muestras)' }
+        ]
+    });
+
+    const [selectedExam, setSelectedExam] = useState<any>(null);
+    const [selectedDate, setSelectedDate] = useState('');
+    const [quotaLeft, setQuotaLeft] = useState(28); // Mock quota
 
     useEffect(() => {
         fetchOrders();
@@ -44,19 +72,46 @@ export const Analisis: React.FC = () => {
 
     const handleBook = (orderId: string) => {
         setBookingOrder(orderId);
-        // Here we would normally open a time slot picker.
-        // For prototype, we'll simulate a "Quick Book" or redirect to a specialized confirmation.
-        // Let's do a "Quick Book" simulation for "Own Format"
+    };
+
+    // Helper to get remaining quota (Mock)
+    const checkQuota = (date: string) => {
+        // Simple mock: weekends have 0, weekdays have random 15-30
+        const d = new Date(date);
+        const day = d.getDay(); // 0 = Sun, 6 = Sat
+        if (day === 5 || day === 6) return 0; // Weekend closed/full
+        return Math.floor(Math.random() * 15) + 15;
+    };
+
+    const handleDateSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSelectedDate(e.target.value);
+        setQuotaLeft(checkQuota(e.target.value));
     };
 
     const confirmBooking = async () => {
+        if (!selectedExam || !selectedDate) return;
+
+        // In real app: Insert into 'lab_orders' or 'appointments'
+        alert(`✅ TICKET GENERADO\n\nExamen: ${selectedExam.name}\nFecha: ${selectedDate}\n\nInstrucciones:\n- Acérquese de 07:00 AM a 10:00 AM.\n- Atención por orden de llegada.\n- Venga en ayunas.`);
+
+        // Optimistic UI update: Add to 'pendingOrders' list
+        const newOrder = {
+            id: Math.random().toString(36).substr(2, 9),
+            type: selectedExam.name,
+            status: 'PENDING',
+            created_at: new Date().toISOString(),
+            scheduled_date: selectedDate, // Store selected date
+            doctors: { firstname: 'Sistema', lastname: '(Autosolicitado)' }
+        };
+
+        setOrders([newOrder, ...orders]);
+        setSelectedExam(null);
+        setSelectedDate('');
+    };
+
+    const confirmExistingOrderBooking = async () => {
         if (!bookingOrder) return;
-
-        // Update order status to 'PROCESSING' (Simulating "Sample Taken" or "Appointment Scheduled")
-        // In real app, we would create an appointment in 'appointments' table linked to this order.
-        alert("🗓️ ¡Cita para Toma de Muestra Agendada!\n\nTe esperamos mañana de 07:00 AM a 09:00 AM en ayunas.");
-
-        // Optimistic update
+        alert("🗓️ ¡Cita para Toma de Muestra Agendada!\n\nTe esperamos mañana de 07:00 AM a 10:00 AM en ayunas.");
         setOrders(orders.map(o => o.id === bookingOrder ? { ...o, status: 'PROCESSING' } : o));
         setBookingOrder(null);
     };
@@ -64,7 +119,7 @@ export const Analisis: React.FC = () => {
     return (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500 pb-20">
 
-            {/* 1. New Header (Black Text, "Bonito" Light Design) */}
+            {/* 1. Header Logic */}
             <div className="relative bg-white rounded-[2.5rem] p-8 md:p-12 shadow-xl shadow-slate-200 overflow-hidden border border-slate-100">
                 {/* Abstract Shapes */}
                 <div className="absolute top-0 right-0 w-64 h-64 bg-slate-50 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
@@ -82,7 +137,10 @@ export const Analisis: React.FC = () => {
                                 Mis Análisis
                             </h1>
                             <p className="text-slate-600 font-medium text-lg max-w-md leading-relaxed">
-                                Gestiona tus órdenes médicas y agenda tu toma de muestra <span className="text-slate-900 font-bold">únicamente</span> si tienes una orden pendiente.
+                                Solicita tus exámenes de laboratorio y obtén tu ticket de atención rápida.
+                                <span className="block mt-2 text-sm text-slate-500 bg-slate-100 inline-block px-2 py-1 rounded font-bold">
+                                    Horario de Toma de Muestras: 07:00 AM - 10:00 AM
+                                </span>
                             </p>
                             {patientName && (
                                 <div className="mt-4 inline-flex items-center gap-2 bg-slate-900 text-white px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
@@ -112,107 +170,148 @@ export const Analisis: React.FC = () => {
             ) : (
                 <div className="space-y-12">
 
-                    {/* SECTION 1: BOOKING & PENDING (The "Own Format" Logic) */}
+                    {/* SECTION 1: CATALOG & BOOKING (NEW LOGIC) */}
                     <div>
                         <div className="flex items-center gap-3 mb-6">
                             <div className="h-8 w-1 bg-black rounded-full"></div>
-                            <h2 className="text-2xl font-black text-slate-900">Órdenes Pendientes</h2>
+                            <h2 className="text-2xl font-black text-slate-900">Solicitar Examen</h2>
                         </div>
 
-                        {pendingOrders.length === 0 ? (
-                            // LOCKED STATE
-                            <Card className="p-8 md:p-12 border-2 border-dashed border-slate-200 bg-slate-50/50 text-center relative overflow-hidden">
-                                <div className="relative z-10 max-w-lg mx-auto">
-                                    <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-slate-300 shadow-sm mb-6">
-                                        <Lock size={32} />
-                                    </div>
-                                    <h3 className="text-xl font-bold text-slate-800 mb-2">Reserva Bloqueada</h3>
-                                    <p className="text-slate-500 mb-8">
-                                        No puedes agendar una cita de laboratorio sin una orden médica vigente.
-                                        Por favor, acude primero a <b>Medicina General</b> para ser evaluado.
-                                    </p>
-                                    <Button
-                                        onClick={() => navigate('/cliente/reservar')}
-                                        variant="outline"
-                                        className="h-12 px-8 rounded-xl border-slate-300 text-slate-600 hover:border-black hover:text-black font-bold transition-all"
-                                    >
-                                        Ir a Medicina General
-                                    </Button>
-                                </div>
-                            </Card>
-                        ) : (
-                            // ACTIVE ORDERS LIST
-                            <div className="grid gap-6">
-                                {pendingOrders.map(order => (
-                                    <Card key={order.id} className="border-0 shadow-lg shadow-slate-200/50 bg-white overflow-hidden ring-1 ring-slate-100">
-                                        <div className="p-6 md:p-8 flex flex-col md:flex-row justify-between gap-6">
-                                            <div className="flex-1">
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <span className="bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                                        Requiere Agendar
-                                                    </span>
-                                                    <span className="text-slate-300 text-xs font-mono">#{order.id.slice(0, 6)}</span>
+                        {/* CATALOG GRID */}
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {Object.entries(availableExams).map(([category, exams]) => (
+                                <Card key={category} className="p-6 border border-slate-100 bg-white/50 hover:bg-white transition-all shadow-sm">
+                                    <h3 className="text-lg font-black text-slate-800 mb-4 flex items-center gap-2">
+                                        <div className="w-2 h-2 bg-black rounded-full"></div>
+                                        {category}
+                                    </h3>
+                                    <div className="space-y-3">
+                                        {exams.map((exam) => (
+                                            <div key={exam.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 transition-colors group">
+                                                <div>
+                                                    <div className="font-bold text-sm text-slate-700">{exam.name}</div>
+                                                    <div className="text-xs text-slate-400">{exam.desc}</div>
                                                 </div>
-                                                <h3 className="text-2xl font-black text-slate-900 mb-2">{order.type}</h3>
-                                                <p className="text-slate-500 font-medium">
-                                                    Dr. {order.doctors?.firstname} {order.doctors?.lastname}
+                                                <Button
+                                                    variant="outline"
+                                                    onClick={() => setSelectedExam(exam)}
+                                                    className="opacity-0 group-hover:opacity-100 transition-opacity border-slate-200"
+                                                >
+                                                    Solicitar
+                                                </Button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </Card>
+                            ))}
+                        </div>
+
+                        {/* BOOKING MODAL */}
+                        {selectedExam && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+                                <div className="bg-white rounded-3xl shadow-2xl max-w-md w-full p-8 relative">
+                                    <button
+                                        onClick={() => { setSelectedExam(null); setSelectedDate(''); }}
+                                        className="absolute top-4 right-4 text-slate-400 hover:text-black"
+                                    >
+                                        ✕
+                                    </button>
+
+                                    <div className="text-center mb-6">
+                                        <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-900">
+                                            <TestTube size={32} />
+                                        </div>
+                                        <h3 className="text-xl font-black text-slate-900 mb-1">Confirmar Solicitud</h3>
+                                        <p className="text-slate-500 text-sm">Estás solicitando: <b className="text-slate-800">{selectedExam.name}</b></p>
+                                    </div>
+
+                                    <div className="space-y-4 mb-8">
+                                        <div>
+                                            <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Selecciona Fecha</label>
+                                            <input
+                                                type="date"
+                                                className="w-full border border-slate-200 rounded-xl p-3 text-sm focus:ring-2 focus:ring-black/5 outline-none font-medium"
+                                                min={new Date().toISOString().split('T')[0]}
+                                                onChange={handleDateSelect}
+                                            />
+                                        </div>
+
+                                        {selectedDate && (
+                                            <div className={`p-4 rounded-xl border ${quotaLeft > 0 ? 'bg-green-50 border-green-100 text-green-800' : 'bg-red-50 border-red-100 text-red-800'}`}>
+                                                <div className="flex justify-between items-center mb-1">
+                                                    <span className="font-bold text-sm">Disponibilidad</span>
+                                                    <span className="font-black text-lg">{quotaLeft}/30</span>
+                                                </div>
+                                                <p className="text-xs opacity-80">
+                                                    {quotaLeft > 0
+                                                        ? "Hay cupos disponibles. Atención por orden de llegada (07:00 - 10:00 AM)."
+                                                        : "No hay cupos para esta fecha. Selecciona otro día."}
                                                 </p>
                                             </div>
+                                        )}
+                                    </div>
 
-                                            {/* BOOKING ACTION AREA */}
-                                            <div className="bg-slate-50 rounded-2xl p-4 md:min-w-[300px] border border-slate-100 flex flex-col justify-center">
-                                                {bookingOrder === order.id ? (
-                                                    <div className="space-y-3 animate-in fade-in zoom-in duration-300">
-                                                        <div className="text-center">
-                                                            <div className="text-sm font-bold text-slate-900 mb-1">Selecciona Horario (Mañana)</div>
-                                                            <div className="text-xs text-slate-500">7:00 AM - 10:00 AM</div>
-                                                        </div>
-                                                        <div className="h-px bg-slate-200 w-full"></div>
-                                                        <div className="flex gap-2">
-                                                            <Button
-                                                                onClick={() => setBookingOrder(null)}
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                className="flex-1 text-slate-400 hover:text-red-500"
-                                                            >
-                                                                Cancelar
-                                                            </Button>
-                                                            <Button
-                                                                onClick={confirmBooking}
-                                                                className="flex-1 bg-black text-white hover:bg-slate-800 font-bold shadow-lg"
-                                                            >
-                                                                Confirmar
-                                                            </Button>
-                                                        </div>
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-center">
-                                                        <p className="text-xs text-slate-400 font-medium mb-4">
-                                                            Tienes una orden lista para ser procesada.
-                                                        </p>
-                                                        <Button
-                                                            onClick={() => handleBook(order.id)}
-                                                            className="w-full bg-slate-900 hover:bg-black text-white font-bold h-12 rounded-xl shadow-md hover:shadow-xl transition-all flex items-center justify-center gap-2"
-                                                        >
-                                                            <Calendar size={18} />
-                                                            Agendar Toma de Muestra
-                                                        </Button>
-                                                    </div>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </Card>
-                                ))}
+                                    <Button
+                                        onClick={confirmBooking}
+                                        disabled={!selectedDate || quotaLeft === 0}
+                                        className="w-full bg-black text-white hover:bg-slate-800 h-12 rounded-xl font-bold shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        Generar Ticket
+                                    </Button>
+                                    <p className="text-[10px] text-center text-slate-400 mt-4">
+                                        Al confirmar, se generará una orden interna. Debes asistir puntualmente.
+                                    </p>
+                                </div>
                             </div>
                         )}
                     </div>
 
-                    {/* SECTION 2: HISTORY (Existing results) */}
+                    {/* SECTION 2: PENDING ORDERS LIST */}
+                    {pendingOrders.length > 0 && (
+                        <div>
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="h-8 w-1 bg-yellow-400 rounded-full"></div>
+                                <h2 className="text-2xl font-black text-slate-900">Tickets Generados / Pendientes</h2>
+                            </div>
+                            <div className="grid gap-4">
+                                {pendingOrders.map(order => (
+                                    <Card key={order.id} className="p-6 border-l-4 border-l-yellow-400 flex items-center justify-between">
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="bg-yellow-100 text-yellow-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Pendiente</span>
+                                                <span className="text-xs text-slate-400 font-mono">#{order.id.slice(0, 8)}</span>
+                                            </div>
+                                            <h4 className="font-bold text-slate-900 text-lg">{order.type}</h4>
+
+                                            <p className="text-sm text-slate-500">Dr. {order.doctors?.lastname || 'Sistema'}</p>
+
+                                            {/* SCHEDULED DATE DISPLAY */}
+                                            {order.scheduled_date && (
+                                                <div className="mt-2 inline-flex items-center gap-2 bg-slate-100 rounded-lg px-2 py-1">
+                                                    <Calendar size={12} className="text-slate-500" />
+                                                    <span className="text-xs font-bold text-slate-700">
+                                                        {new Date(order.scheduled_date + 'T12:00:00').toLocaleDateString()}
+                                                    </span>
+                                                </div>
+                                            )}
+
+                                        </div>
+                                        <div className="text-right">
+                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Acudir</div>
+                                            <div className="font-black text-xl text-slate-900">07:00 AM</div>
+                                        </div>
+                                    </Card>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* SECTION 3: HISTORY (Renamed to Exámenes Realizados) */}
                     {historyOrders.length > 0 && (
                         <div>
                             <div className="flex items-center gap-3 mb-6 opacity-60">
                                 <div className="h-8 w-1 bg-slate-200 rounded-full"></div>
-                                <h2 className="text-2xl font-black text-slate-400">Historial de Resultados</h2>
+                                <h2 className="text-2xl font-black text-slate-400">Exámenes Realizados</h2>
                             </div>
 
                             <div className="grid gap-4 opacity-75 hover:opacity-100 transition-opacity">
@@ -235,7 +334,7 @@ export const Analisis: React.FC = () => {
                                                 Procesando
                                             </span>
                                         ) : (
-                                            <Button variant="ghost" size="sm" className="text-slate-400 hover:text-black gap-2">
+                                            <Button className="text-slate-400 hover:text-black gap-2 bg-transparent shadow-none border-0 p-0">
                                                 <Download size={16} /> Descargar
                                             </Button>
                                         )}

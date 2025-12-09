@@ -20,7 +20,8 @@ export const BookingConfirmation: React.FC = () => {
         'medicina general': 'Medicina General',
         'obstetricia': 'Obstetricia',
         'dental': 'Dental',
-        'emergencia': 'Emergencia'
+        'emergencia': 'Emergencia',
+        'cres': 'CRED (Crecimiento y Desarrollo)'
     };
 
     // Use mapped name or fallback to Title Case roughly (or just raw for ilike)
