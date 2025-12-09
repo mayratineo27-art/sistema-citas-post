@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,6 +6,30 @@
 
 @layer base {
   body {
-    font-family: 'EB Garamond', serif;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    @apply bg-slate-50 text-slate-900;
+  }
+}
+
+@layer utilities {
+  .bg-medical-pattern {
+    background-color: #f8fafc;
+    background-image:
+      radial-gradient(at 0% 0%, hsla(174, 76%, 90%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 0%, hsla(199, 89%, 92%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(174, 76%, 90%, 1) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(199, 89%, 92%, 1) 0, transparent 50%);
+    background-attachment: fixed;
+  }
+
+  /* Fix for Tailwind @apply parsing error: use standard CSS for box-shadow */
+  .glass-sidebar {
+    @apply bg-white/80 backdrop-blur-xl border-r border-white/50;
+    box-shadow: 4px 0 24px rgba(20, 184, 166, 0.05);
+  }
+
+  .glass-card {
+    @apply bg-white/70 backdrop-blur-lg border border-white/60;
+    box-shadow: 0 10px 15px -3px rgba(100, 116, 139, 0.1);
   }
 }

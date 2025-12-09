@@ -114,19 +114,19 @@ export const BookingSlots: React.FC = () => {
                 </section>
             </div>
 
-            {/* Confirmation Footer - Floating Glass */}
+            {/* Confirmation Footer - Floating Glass Light Theme */}
             <div className="fixed bottom-6 left-4 right-4 md:left-auto md:right-auto md:w-full md:max-w-3xl md:mx-auto z-30">
-                <div className="bg-slate-900/95 backdrop-blur-xl p-4 rounded-[2rem] shadow-2xl border border-white/10 flex items-center justify-between gap-6 transition-all duration-500 transform translate-y-0 text-white">
+                <div className="bg-white/90 backdrop-blur-xl p-4 rounded-[2rem] shadow-2xl shadow-teal-900/10 border border-teal-100 flex items-center justify-between gap-6 transition-all duration-500 transform translate-y-0">
                     <div className="pl-4">
-                        <p className="text-[10px] text-slate-400 uppercase tracking-widest font-bold">Selección</p>
-                        <p className="text-xl font-bold text-white tracking-tight">{selectedSlot || '--:--'}</p>
+                        <p className="text-[10px] text-teal-600 uppercase tracking-widest font-bold">Selección</p>
+                        <p className="text-2xl font-black text-slate-800 tracking-tight">{selectedSlot || '--:--'}</p>
                     </div>
                     <Button
                         className={`
-                            rounded-xl px-8 py-3 text-base font-bold tracking-wide transition-all shadow-lg
+                            rounded-xl px-12 py-4 text-base font-bold tracking-wide transition-all shadow-xl h-14 flex items-center
                             ${!selectedSlot
-                                ? 'bg-slate-800 text-slate-600 cursor-not-allowed opacity-50'
-                                : 'bg-teal-500 text-white hover:bg-teal-400 animate-pulse hover:animate-none hover:scale-105 shadow-teal-500/30'}
+                                ? 'bg-slate-300 text-slate-600 border border-slate-400 opacity-70 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-teal-500 to-teal-600 text-white hover:shadow-teal-500/40 hover:scale-[1.02] active:scale-95'}
                         `}
                         disabled={!selectedSlot}
                         onClick={handleConfirm}

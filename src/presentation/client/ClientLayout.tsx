@@ -49,104 +49,103 @@ export const ClientLayout: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50 flex font-sans text-slate-800">
-            {/* Sidebar Desktop - LIGHT PREMIUM THEME */}
-            <aside className="hidden md:flex flex-col w-72 bg-white border-r border-slate-200 fixed h-full z-10 transition-all duration-300 shadow-xl shadow-slate-200/50">
+        <div className="min-h-screen bg-medical-pattern flex font-sans text-slate-800">
+            {/* Sidebar Desktop - REDESIGNED ELEGANT GLASS */}
+            <aside className="hidden md:flex flex-col w-72 h-screen fixed left-0 top-0 z-20 transition-all duration-300 border-r border-white/40 bg-white/60 backdrop-blur-xl shadow-2xl shadow-teal-900/5">
 
-                {/* Brand Header */}
-                <div className="p-8 relative overflow-hidden bg-gradient-to-br from-teal-500 to-teal-700">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2"></div>
-
-                    <div className="relative z-10 flex items-center gap-4">
-                        <div className="w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30 shadow-inner">
-                            <span className="text-white font-black text-2xl">+</span>
+                {/* 1. Brand Header */}
+                <div className="p-8 pb-4">
+                    <div className="flex items-center gap-3 group cursor-pointer">
+                        <div className="w-10 h-10 bg-gradient-to-br from-teal-500 to-teal-600 rounded-xl flex items-center justify-center shadow-lg shadow-teal-500/20 text-white font-black text-xl transform group-hover:scale-110 transition-transform duration-300">
+                            +
                         </div>
-                        <div>
-                            <h1 className="text-xl font-black text-white tracking-wide text-shadow-sm">CITAMEDIC</h1>
-                            <p className="text-[10px] text-teal-100 uppercase tracking-wider font-bold opacity-80">Huamanga</p>
+                        <div className="flex flex-col">
+                            <h1 className="text-lg font-bold text-slate-800 tracking-tight leading-4">CITAMEDIC</h1>
+                            <span className="text-[10px] font-bold text-teal-600 uppercase tracking-widest">Portal Salud</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Profile Selector - Light Mode Integration */}
-                <div className="px-6 mb-6 mt-6">
-                    <div className="relative">
+                {/* 2. Profile Selector (Compact & Floating) */}
+                <div className="px-6 py-2">
+                    <div className="relative group">
                         <button
                             onClick={() => setIsProfileSelectorOpen(!isProfileSelectorOpen)}
-                            className="w-full flex items-center justify-between bg-slate-50 hover:bg-slate-100 border border-slate-200 hover:border-teal-200 rounded-2xl p-4 transition-all group shadow-sm hover:shadow-md"
+                            className="w-full flex items-center gap-3 bg-white/50 hover:bg-white border border-slate-200/50 hover:border-teal-200 rounded-2xl p-3 transition-all duration-200 shadow-sm hover:shadow-md"
                         >
-                            <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-colors ${activeDni === '12345678' ? 'border-indigo-100 bg-indigo-50 text-indigo-600' : 'border-pink-100 bg-pink-50 text-pink-500'}`}>
-                                    {activeDni === '12345678' ? <User size={18} /> : <Baby size={18} />}
-                                </div>
-                                <div className="text-left">
-                                    <div className="text-[10px] font-bold text-slate-400 uppercase group-hover:text-teal-600 transition-colors">Perfil Activo</div>
-                                    <div className="text-xs font-bold text-slate-700 truncate w-28">{patientName}</div>
-                                </div>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all ${activeDni === '12345678' ? 'border-teal-100 bg-teal-50 text-teal-600' : 'border-pink-100 bg-pink-50 text-pink-500'}`}>
+                                {activeDni === '12345678' ? <UserCircle size={20} strokeWidth={1.5} /> : <Baby size={20} strokeWidth={1.5} />}
                             </div>
-                            <ChevronRight size={16} className="text-slate-400 group-hover:text-teal-600 transition-colors" />
+                            <div className="flex-1 text-left overflow-hidden">
+                                <div className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Perfil Activo</div>
+                                <div className="text-sm font-bold text-slate-700 truncate">{patientName}</div>
+                            </div>
+                            <div className="text-slate-300 group-hover:text-teal-500 transition-colors">
+                                <ChevronRight size={16} />
+                            </div>
                         </button>
 
                         {isProfileSelectorOpen && (
-                            <div className="absolute top-full left-0 w-full mt-2 bg-white border border-slate-100 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-                                <div className="p-2 space-y-1">
+                            <div className="absolute top-[110%] left-0 w-full bg-white/90 backdrop-blur-xl border border-slate-100 rounded-2xl shadow-xl shadow-slate-200/50 overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-200 p-2 space-y-1">
+                                <button
+                                    onClick={() => switchProfile('12345678', 'Usuario Principal')}
+                                    className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${activeDni === '12345678' ? 'bg-teal-50 text-teal-700' : 'hover:bg-slate-50 text-slate-500'}`}
+                                >
+                                    <UserCircle size={16} /> Usuario Principal
+                                </button>
+                                {childrenProfiles.map(child => (
                                     <button
-                                        onClick={() => switchProfile('12345678', 'Usuario Principal')}
-                                        className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${activeDni === '12345678' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-slate-50 text-slate-600'}`}
+                                        key={child.id}
+                                        onClick={() => switchProfile(child.dni, child.first_name)}
+                                        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold transition-all ${activeDni === child.dni ? 'bg-pink-50 text-pink-700' : 'hover:bg-slate-50 text-slate-500'}`}
                                     >
-                                        <UserCircle size={16} /> Usuario Principal
-                                        {activeDni === '12345678' && <Check size={14} className="ml-auto" />}
+                                        <Baby size={16} /> {child.first_name}
                                     </button>
-                                    {childrenProfiles.map(child => (
-                                        <button
-                                            key={child.id}
-                                            onClick={() => switchProfile(child.dni, `${child.first_name}`)}
-                                            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-colors ${activeDni === child.dni ? 'bg-pink-50 text-pink-700' : 'hover:bg-slate-50 text-slate-600'}`}
-                                        >
-                                            <Baby size={16} /> {child.first_name}
-                                            {activeDni === child.dni && <Check size={14} className="ml-auto" />}
-                                        </button>
-                                    ))}
-                                </div>
+                                ))}
                             </div>
                         )}
                     </div>
                 </div>
 
-                {/* Navigation Items */}
-                <nav className="flex-1 overflow-y-auto px-4 space-y-2">
-                    <p className="px-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 ml-1">Menu Principal</p>
-                    {navItems.map((item) => (
-                        <Link
-                            key={item.path}
-                            to={item.path}
-                            className={`
-                                flex items-center space-x-3 px-4 py-4 rounded-xl text-sm font-bold transition-all group relative overflow-hidden
-                                ${location.pathname === item.path
-                                    ? 'bg-teal-50 text-teal-800 shadow-sm ring-1 ring-teal-100 border-r-4 border-teal-500'
-                                    : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'}
-                            `}
-                        >
-
-                            <span className={`${location.pathname === item.path ? 'text-teal-600' : 'text-slate-400 group-hover:text-slate-600'} transition-colors`}>
-                                {item.icon}
-                            </span>
-                            <span>{item.label}</span>
-                        </Link>
-                    ))}
+                {/* 3. Navigation Links */}
+                <nav className="flex-1 px-4 py-4 space-y-2 overflow-y-auto">
+                    <p className="px-4 text-[10px] font-black text-slate-300 uppercase tracking-widest mb-3">Menú Principal</p>
+                    {navItems.map((item) => {
+                        const isActive = location.pathname === item.path;
+                        return (
+                            <Link
+                                key={item.path}
+                                to={item.path}
+                                className={`
+                                    flex items-center gap-3 px-4 py-3.5 rounded-2xl text-sm font-medium transition-all duration-300 group
+                                    ${isActive
+                                        ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/30 translate-x-1'
+                                        : 'text-slate-500 hover:text-teal-700 hover:bg-teal-50/50 hover:pl-6'}
+                                `}
+                            >
+                                <span className={`${isActive ? 'text-white' : 'text-slate-400 group-hover:text-teal-500'} transition-colors duration-300`}>
+                                    {React.cloneElement(item.icon as any, { strokeWidth: isActive ? 2.5 : 2, size: 20 })}
+                                </span>
+                                <span className={`font-bold tracking-wide ${isActive ? 'text-white' : ''}`}>
+                                    {item.label}
+                                </span>
+                            </Link>
+                        );
+                    })}
                 </nav>
 
-                {/* Footer */}
-                <div className="p-6 border-t border-slate-100">
-                    <Link to="/login" className="flex items-center space-x-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all">
-                        <LogOut size={18} />
+                {/* 4. Footer */}
+                <div className="p-6 border-t border-slate-100/50">
+                    <Link to="/login" className="flex items-center gap-3 px-4 py-3 rounded-2xl text-sm font-bold text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all duration-300 group">
+                        <LogOut size={18} className="group-hover:-translate-x-1 transition-transform" />
                         <span>Cerrar Sesión</span>
                     </Link>
                 </div>
+
             </aside>
 
             {/* Mobile Header */}
-            <div className="md:hidden fixed top-0 w-full bg-white border-b border-slate-200 z-20 px-4 py-3 flex justify-between items-center shadow-sm">
+            <div className="md:hidden fixed top-0 w-full bg-white/80 backdrop-blur-md border-b border-slate-200 z-20 px-4 py-3 flex justify-between items-center shadow-sm">
                 <span className="font-bold text-slate-800 flex items-center gap-2">
                     <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center text-white font-black text-lg">+</div>
                     CITAMEDIC
@@ -157,11 +156,11 @@ export const ClientLayout: React.FC = () => {
             </div>
 
             {/* Main Content */}
-            <main className="flex-1 md:ml-72 p-4 md:p-8 mt-14 md:mt-0 transition-all duration-300 bg-slate-50/50">
-                <div className="max-w-5xl mx-auto">
+            <main className="flex-1 md:ml-72 p-4 md:p-8 mt-14 md:mt-0 transition-all duration-300">
+                <div className="max-w-6xl mx-auto">
                     {/* Active Profile Banner for Mobile/Overview */}
                     <div className="mb-6 md:hidden">
-                        <div className="bg-white border boundary-slate-200 rounded-xl p-3 flex items-center justify-between shadow-sm" onClick={() => setIsProfileSelectorOpen(!isProfileSelectorOpen)}>
+                        <div className="bg-white/80 backdrop-blur-sm border boundary-slate-200 rounded-xl p-3 flex items-center justify-between shadow-sm" onClick={() => setIsProfileSelectorOpen(!isProfileSelectorOpen)}>
                             <div className="flex items-center gap-3">
                                 <div className={`w-8 h-8 rounded-full flex items-center justify-center ${activeDni === '12345678' ? 'bg-indigo-100 text-indigo-600' : 'bg-pink-100 text-pink-600'}`}>
                                     {activeDni === '12345678' ? <User size={16} /> : <Baby size={16} />}
@@ -202,7 +201,7 @@ export const ClientLayout: React.FC = () => {
                 </div>
             </main>
 
-            {/* Mobile Menu Overlay - Updated to Dark Theme */}
+            {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
                 <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setIsMobileMenuOpen(false)}>
                     <div className="absolute right-0 top-0 h-full w-72 bg-white shadow-xl p-6 flex flex-col" onClick={e => e.stopPropagation()}>
@@ -216,7 +215,7 @@ export const ClientLayout: React.FC = () => {
                                     key={item.path}
                                     to={item.path}
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    className={`flex items-center space-x-3 px-4 py-4 rounded-xl font-bold ${location.pathname === item.path ? 'bg-teal-50 text-teal-700' : 'text-slate-500 hover:bg-slate-50'}`}
+                                    className={`flex items-center space-x-3 px-4 py-4 rounded-xl font-bold ${location.pathname === item.path ? 'bg-teal-600 text-white shadow-lg shadow-teal-500/30' : 'text-slate-500 hover:bg-slate-50'}`}
                                 >
                                     {item.icon}
                                     <span>{item.label}</span>
