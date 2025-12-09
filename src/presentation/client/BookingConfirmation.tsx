@@ -1,36 +1,149 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../components/ui/Button';
-import { ChevronLeft, User, Calendar, Clock } from 'lucide-react';
+import { ChevronLeft, User, Calendar, Clock, Loader2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { supabaseClient } from '../../infrastructure/db/client';
 
 export const BookingConfirmation: React.FC = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     // Get params from URL
-    const specialty = searchParams.get('specialty') || 'Medicina General';
-    const service = searchParams.get('service');
+    const specialtyParam = searchParams.get('specialty') || 'Medicina General';
+    // Fix: 'medicina-general' -> 'medicina general'
+    let rawName = specialtyParam.replace(/-/g, ' ');
+
+    // Normalize accents mapping
+    const specialtyMap: Record<string, string> = {
+        'psicologia': 'Psicología',
+        'topico': 'Tópico',
+        'medicina general': 'Medicina General',
+        'obstetricia': 'Obstetricia',
+        'dental': 'Dental',
+        'emergencia': 'Emergencia'
+    };
+
+    // Use mapped name or fallback to Title Case roughly (or just raw for ilike)
+    const specialtyName = specialtyMap[rawName.toLowerCase()] || rawName;
     const date = searchParams.get('date') || '2025-12-06';
     const time = searchParams.get('time') || '08:00 AM';
 
-    // Mock Patient Data (In real app, fetch from Supabase based on auth.user)
-    const [patient] = useState({
-        firstName: 'Juan',
-        lastName: 'Perez',
+    const [loading, setLoading] = useState(false);
+    const [patientId, setPatientId] = useState<string | null>(null);
+
+    // Mock Patient Data (Updated from DB)
+    const [patient, setPatient] = useState({
+        firstName: 'Cargando...',
+        lastName: '',
         dni: '12345678',
-        insurance: 'SIS GRATUITO',
-        sex: 'MASCULINO',
-        birthDate: '1990-05-15',
-        age: 33 // Would calculate from birthDate
+        insurance: '...',
+        sex: '...',
+        birthDate: '...',
+        age: 0
     });
 
-    const handleConfirm = async () => {
-        // Placeholder for Supabase logic
-        // await supabase.from('appointments').insert(...)
+    useEffect(() => {
+        const loadPatient = async () => {
+            // Hardcoded DNI for prototype (Dynamic updated)
+            const activeDni = localStorage.getItem('activePatientDni') || '12345678';
+            const { data, error } = await supabaseClient
+                .from('patients')
+                .select('*')
+                .eq('dni', activeDni)
+                .single();
 
-        // Show success and redirect
-        alert("¡Cita Confirmada Exitosamente!");
-        navigate('/cliente/citas');
+            if (data) {
+                setPatientId(data.id);
+                setPatient({
+                    firstName: data.first_name,
+                    lastName: data.last_name,
+                    dni: data.dni,
+                    insurance: data.insurance_type || 'SIS',
+                    sex: data.sex || 'MALE',
+                    birthDate: data.birth_date,
+                    age: new Date().getFullYear() - new Date(data.birth_date).getFullYear()
+                });
+            } else {
+                console.error("Patient not found", error);
+            }
+        };
+        loadPatient();
+    }, []);
+
+    const handleConfirm = async () => {
+        console.log("🔵 Iniciando Confirmación...");
+
+        if (!patientId) {
+            alert("Error: No se identificó al paciente (ID nulo). Espere a que carguen los datos.");
+            return;
+        }
+        setLoading(true);
+        try {
+            console.log("🔍 Buscando especialidad:", specialtyName);
+
+            // 1. Find Specialty ID
+            const { data: specData, error: specError } = await supabaseClient
+                .from('specialties')
+                .select('id, name')
+                .ilike('name', `%${specialtyName}%`)
+                .limit(1)
+                .single();
+
+            if (specError || !specData) {
+                console.error("❌ Error especialidad:", specError);
+                throw new Error(`Especialidad '${specialtyName}' no encontrada.`);
+            }
+            console.log("✅ Especialidad encontrada:", specData);
+
+            // 2. Assign Doctor (Random active doctor for now)
+            const { data: docData, error: docError } = await supabaseClient
+                .from('doctors')
+                .select('id')
+                .eq('specialty_id', specData.id)
+                .limit(1)
+                .single();
+
+            if (docError || !docData) {
+                console.error("❌ Error doctor:", docError);
+                throw new Error("No hay doctores disponibles para esta especialidad.");
+            }
+            console.log("✅ Doctor asignado:", docData.id);
+
+            // 3. Create Appointment
+            // Combine Date and Time into ISO string
+            // Assuming time is "08:00 AM" formatting
+            const [timePart, modifier] = time.split(' ');
+            let [hours, minutes] = timePart.split(':');
+            if (hours === '12') hours = '00';
+            if (modifier === 'PM') hours = String(parseInt(hours, 10) + 12);
+
+            const isoDateTime = `${date}T${hours.padStart(2, '0')}:${minutes}:00`;
+
+            const { error: insertError } = await supabaseClient
+                .from('appointments')
+                .insert({
+                    patient_id: patientId,
+                    doctor_id: docData.id,
+                    date_time: isoDateTime,
+                    status: 'PENDING',
+                    reason: 'Reserva Web Debug'
+                });
+
+            if (insertError) {
+                console.error("❌ Error insert:", insertError);
+                throw insertError;
+            }
+
+            console.log("✅ Cita insertada correctamente!");
+            alert("¡Cita Confirmada Exitosamente!");
+            navigate('/cliente/citas');
+
+        } catch (error: any) {
+            console.error("🚨 Booking Critical Error:", error);
+            alert(`Error al reservar: ${error.message || JSON.stringify(error)}`);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -116,7 +229,7 @@ export const BookingConfirmation: React.FC = () => {
                             <label className="block text-xs font-bold text-slate-500 uppercase mb-1 ml-1">Especialidad Seleccionada</label>
                             <input
                                 type="text"
-                                value={specialty.replace('-', ' ').toUpperCase()}
+                                value={specialtyParam.replace(/-/g, ' ').toUpperCase()}
                                 readOnly
                                 className="w-full bg-slate-100 border-none rounded-lg px-4 py-3 text-slate-700 font-bold focus:ring-0"
                             />
@@ -164,9 +277,16 @@ export const BookingConfirmation: React.FC = () => {
                         <div className="pt-8">
                             <Button
                                 onClick={handleConfirm}
-                                className="w-full h-14 text-lg font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-[1.02]"
+                                disabled={loading}
+                                className="w-full h-14 text-lg font-bold bg-sky-600 hover:bg-sky-700 text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2"
                             >
-                                CONFIRMAR CITA
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="animate-spin" /> Procesando...
+                                    </>
+                                ) : (
+                                    "CONFIRMAR CITA"
+                                )}
                             </Button>
                             <p className="text-center text-xs text-slate-400 mt-4">
                                 Al confirmar, aceptas las políticas de privacidad del centro de salud.

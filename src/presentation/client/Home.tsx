@@ -30,7 +30,25 @@ export const Home: React.FC = () => {
             path: '/cliente/analisis',
             color: 'bg-slate-100 text-slate-700 hover:bg-slate-200 border-slate-300'
         },
+        {
+            label: 'MIS FAMILIARES',
+            icon: <Activity className="w-8 h-8 mb-2" />, // Or Users icon
+            path: '/cliente/familiares',
+            color: 'bg-purple-100 text-purple-700 hover:bg-purple-200 border-purple-300'
+        },
     ];
+
+    const [patientName, setPatientName] = React.useState('Paciente');
+
+    React.useEffect(() => {
+        const fetchName = async () => {
+            const activeDni = localStorage.getItem('activePatientDni') || '12345678';
+            // Simple fetch to show name (optional, but good for feedback)
+            const { data } = await import('../../infrastructure/db/client').then(m => m.supabaseClient.from('patients').select('first_name').eq('dni', activeDni).single());
+            if (data) setPatientName(data.first_name);
+        };
+        fetchName();
+    }, []);
 
     return (
         <div className="flex flex-col h-full animate-in fade-in duration-500">
@@ -40,7 +58,7 @@ export const Home: React.FC = () => {
                     <div className="bg-sky-100 p-1 rounded-full text-sky-600">
                         <ChevronRight size={16} />
                     </div>
-                    Paciente
+                    {patientName}
                 </span>
                 <span className="text-slate-400 text-xs font-medium bg-slate-100 px-3 py-1 rounded-full">Menú Principal</span>
             </div>

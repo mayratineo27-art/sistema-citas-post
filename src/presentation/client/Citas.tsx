@@ -86,8 +86,8 @@ export const Citas: React.FC = () => {
                     status,
                     reason,
                     doctors (
-                        firstName,
-                        lastName,
+                        firstname,
+                        lastname,
                         specialties (name)
                     )
                 `)
@@ -103,7 +103,7 @@ export const Citas: React.FC = () => {
                     status: item.status as AppointmentStatus,
                     reason: item.reason,
                     // Handle joined data safely
-                    doctorName: item.doctors ? `Dr. ${item.doctors.firstName} ${item.doctors.lastName}` : 'Dr. Asignado',
+                    doctorName: item.doctors ? `Dr. ${item.doctors.firstname} ${item.doctors.lastname}` : 'Dr. Asignado',
                     specialty: item.doctors?.specialties?.name || 'Medicina General'
                 }));
                 setAppointments(mapped);

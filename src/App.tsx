@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Outlet, Navigate } from 'react-router-dom';
 import { ClientLayout } from './presentation/client/ClientLayout';
@@ -15,6 +16,7 @@ import { TestPage } from './TestPage';
 import { Recetas } from './presentation/client/Recetas';
 import { Historial } from './presentation/client/Historial';
 import { Analisis } from './presentation/client/Analisis';
+import { Familiares } from './presentation/client/Familiares';
 
 // Minimal App for Debugging
 function App() {
@@ -39,6 +41,7 @@ function App() {
                     <Route path="recetas" element={<Recetas />} />
                     <Route path="historial" element={<Historial />} />
                     <Route path="analisis" element={<Analisis />} />
+                    <Route path="familiares" element={<Familiares />} />
 
                     <Route path="perfil" element={<ClientPerfil />} />
                     <Route path="notificaciones" element={<ClientNotificaciones />} />

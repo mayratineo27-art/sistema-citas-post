@@ -33,13 +33,12 @@ CREATE TABLE IF NOT EXISTS public.specialties (
 );
 
 -- 4. DOCTORS TABLE
--- Note: We use double quotes for "firstName" and "lastName" to enforce camelCase
--- matching the TypeScript application's expectation if it strictly queries those names.
+-- Note: We use unquoted names to match the existing schema (firstname/lastname)
 CREATE TABLE IF NOT EXISTS public.doctors (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-  "firstName" TEXT NOT NULL, 
-  "lastName" TEXT NOT NULL,
+  firstName TEXT NOT NULL, 
+  lastName TEXT NOT NULL,
   cmp TEXT UNIQUE NOT NULL,
   specialty_id UUID REFERENCES public.specialties(id),
   is_active BOOLEAN DEFAULT true,
@@ -99,7 +98,7 @@ ON CONFLICT (name) DO NOTHING;
 -- Doctors
 -- We map specialties to IDs to insert doctors
 WITH spec AS (SELECT id, name FROM public.specialties)
-INSERT INTO public.doctors ("firstName", "lastName", cmp, specialty_id)
+INSERT INTO public.doctors (firstName, lastName, cmp, specialty_id)
 SELECT 'Juan', 'Perez (General)', '10001', id FROM spec WHERE name = 'Medicina General'
 UNION ALL
 SELECT 'Ana', 'Gomez (Obs)', '20002', id FROM spec WHERE name = 'Obstetricia'
