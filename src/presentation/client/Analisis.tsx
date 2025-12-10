@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { jsPDF } from 'jspdf';
 import { supabaseClient } from '../../infrastructure/db/client';
 import { Button } from '../components/ui/Button';
 import { Alert } from '../components/ui/Alert';
@@ -396,32 +397,51 @@ export const Analisis: React.FC = () => {
                                             <Button
                                                 variant="primary"
                                                 onClick={() => {
-                                                    // Generate Mock PDF
-                                                    const content = `
-                                                        RESULTADOS DE LABORATORIO - CITAMEDIC
-                                                        =====================================
-                                                        Paciente: ${localStorage.getItem('activePatientDni') || '12345678'}
-                                                        Examen: ${test.test_name}
-                                                        Fecha: ${test.test_date}
-                                                        Doctor: ${test.doctor_name}
-                                                        -------------------------------------
-                                                        Estado: COMPLETADO
-                                                        
-                                                        Valores:
-                                                        - Parametro 1: Normal
-                                                        - Parametro 2: Normal
-                                                        
-                                                        Nota: Este es un documento simulado para demostración.
-                                                    `;
-                                                    const blob = new Blob([content], { type: 'text/plain' });
-                                                    const url = window.URL.createObjectURL(blob);
-                                                    const a = document.createElement('a');
-                                                    a.href = url;
-                                                    a.download = `Resultado_${test.test_name.replace(/\s/g, '_')}.txt`; // Using .txt for simplicity without heavy libs
-                                                    document.body.appendChild(a);
-                                                    a.click();
-                                                    window.URL.revokeObjectURL(url);
-                                                    document.body.removeChild(a);
+                                                    try {
+                                                        const doc = new jsPDF();
+
+                                                        // Header
+                                                        doc.setFillColor(20, 184, 166); // Teal
+                                                        doc.rect(0, 0, 210, 40, 'F');
+                                                        doc.setTextColor(255, 255, 255);
+                                                        doc.setFontSize(22);
+                                                        doc.text('CITAMEDIC', 15, 25);
+                                                        doc.setFontSize(12);
+                                                        doc.text('Laboratorio Clínico', 15, 32);
+
+                                                        // Info
+                                                        doc.setTextColor(50, 50, 50);
+                                                        doc.setFontSize(10);
+                                                        doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 170, 25, { align: 'right' });
+
+                                                        // Content
+                                                        doc.setFontSize(16);
+                                                        doc.text('RESULTADO DE ANÁLISIS', 105, 60, { align: 'center' });
+
+                                                        doc.setDrawColor(200, 200, 200);
+                                                        doc.line(20, 65, 190, 65);
+
+                                                        doc.setFontSize(12);
+                                                        doc.text(`Paciente: ${localStorage.getItem('activePatientDni') || '12345678'}`, 20, 80);
+                                                        doc.text(`Examen: ${test.test_name}`, 20, 90);
+                                                        doc.text(`Médico: ${test.doctor_name}`, 20, 100);
+                                                        doc.text(`Fecha Muestra: ${test.test_date}`, 20, 110);
+
+                                                        doc.rect(20, 120, 170, 50);
+                                                        doc.setFontSize(11);
+                                                        doc.text('Resultados:', 25, 130);
+                                                        doc.setFontSize(10);
+                                                        doc.text(test.notes || 'Valores dentro de los rangos normales.', 25, 140);
+
+                                                        // Footer
+                                                        doc.setFontSize(8);
+                                                        doc.text('Este documento es un reporte médico válido generado digitalmente.', 105, 280, { align: 'center' });
+
+                                                        doc.save(`Resultado_${test.test_name.replace(/\s/g, '_')}.pdf`);
+                                                    } catch (err) {
+                                                        console.error(err);
+                                                        alert("Error al generar PDF. Asegúrate de que el soporte PDF esté cargado.");
+                                                    }
                                                 }}
                                                 className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 shadow-lg shadow-teal-500/30"
                                             >
