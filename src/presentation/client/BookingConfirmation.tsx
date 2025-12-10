@@ -124,15 +124,21 @@ export const BookingConfirmation: React.FC = () => {
                 throw new Error("No hay doctores asignados a esta especialidad actualmente.");
             }
 
-            // 3. Create Appointment Timestamp
-            // Time format "08:00 AM" -> ISO
+            // 3. Create Appointment Timestamp (UTC Conversion)
             const [timePart, modifier] = time.split(' ');
-            let [hours, minutes] = timePart.split(':');
-            if (hours === '12') hours = '00';
-            if (modifier === 'PM') hours = String(parseInt(hours, 10) + 12);
+            let [hours, minutes] = timePart.split(':').map(Number);
 
-            // Robust Date construction
-            const isoDateTime = `${date}T${hours.padStart(2, '0')}:${minutes}:00`;
+            if (modifier === 'PM' && hours < 12) hours += 12;
+            if (modifier === 'AM' && hours === 12) hours = 0;
+
+            // Construct Local Date Object
+            const [y, m, d] = date.split('-').map(Number);
+            const bookingDate = new Date(y, m - 1, d, hours, minutes, 0);
+
+            // Convert to UTC ISO String for DB storage
+            // This ensures 08:30 AM Local -> 13:30 PM UTC (assuming UTC-5)
+            // When retrieved, it converts back 13:30 UTC -> 08:30 AM Local
+            const isoDateTime = bookingDate.toISOString();
 
             const payload = {
                 patient_id: patientId,
