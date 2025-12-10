@@ -208,7 +208,7 @@ export const BookingConfirmation: React.FC = () => {
                 <button onClick={() => navigate(-1)} className="p-2 bg-white rounded-full shadow-sm text-slate-600">
                     <ChevronLeft size={24} />
                 </button>
-                <h1 className="text-xl font-bold text-slate-800">Confirmar Cita</h1>
+                <h1 className="text-xl font-bold text-slate-800">Confirmar Cita (v2.1)</h1>
             </div>
 
             {/* LEFT COLUMN: Patient Card (REDESIGNED LIGHT) */}
@@ -219,7 +219,7 @@ export const BookingConfirmation: React.FC = () => {
                         <ChevronLeft size={24} />
                     </button>
                     <div className="bg-teal-600 text-white px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg shadow-teal-500/20">
-                        Paso Final
+                        Paso Final (v2.1 Fix)
                     </div>
                     <span className="text-slate-400 font-medium">Verificación de Datos</span>
                 </div>
