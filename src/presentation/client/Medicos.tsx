@@ -129,46 +129,51 @@ export const Medicos: React.FC = () => {
             {/* Doctors Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {MOCK_DOCTORS.map((doctor) => (
-                    <div key={doctor.id} className="group relative bg-white/60 backdrop-blur-xl border border-white/50 rounded-[2rem] p-6 shadow-xl shadow-slate-200/50 hover:shadow-2xl hover:shadow-teal-900/10 hover:-translate-y-1 transition-all duration-300">
+                    <div key={doctor.id} className="group relative bg-white/70 backdrop-blur-2xl border border-white/60 rounded-[2.5rem] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_40px_rgba(20,184,166,0.1)] hover:-translate-y-1 transition-all duration-300">
 
                         {/* Profile Header */}
-                        <div className="flex items-center gap-4 mb-6">
-                            <div className={`w-16 h-16 rounded-2xl shadow-lg flex items-center justify-center text-2xl font-black ${doctor.imageColor}`}>
+                        <div className="flex items-center gap-5 mb-6">
+                            <div className={`w-20 h-20 rounded-[1.5rem] shadow-xl shadow-slate-200/50 flex items-center justify-center text-3xl font-black ${doctor.imageColor} transform group-hover:scale-105 transition-transform duration-300`}>
                                 {doctor.name.split(' ')[1][0]}
                             </div>
                             <div>
-                                <h3 className="text-lg font-bold text-slate-800 leading-tight group-hover:text-teal-700 transition-colors">{doctor.name}</h3>
-                                <p className="text-sm font-medium text-slate-400">{doctor.specialty}</p>
+                                <h3 className="text-xl font-bold text-slate-800 leading-tight group-hover:text-teal-700 transition-colors tracking-tight">{doctor.name}</h3>
+                                <p className="text-sm font-semibold text-slate-400 mt-1">{doctor.specialty}</p>
                             </div>
                         </div>
 
                         {/* Stats Row */}
-                        <div className="flex items-center justify-between mb-6 bg-white/50 rounded-xl p-3 border border-white/60">
-                            <div className="flex items-center gap-1.5">
-                                <Star size={16} className="text-amber-400 fill-amber-400" />
-                                <span className="font-bold text-slate-700">{doctor.rating}</span>
-                                <span className="text-xs text-slate-400 font-medium">Rating</span>
+                        <div className="flex items-center justify-between mb-8 bg-white/40 rounded-2xl p-4 border border-white/50 backdrop-blur-sm">
+                            <div className="flex items-center gap-2">
+                                <div className="bg-amber-100/50 p-1.5 rounded-lg text-amber-500">
+                                    <Star size={16} className="fill-amber-500" />
+                                </div>
+                                <div>
+                                    <span className="font-bold text-slate-800 block leading-none">{doctor.rating}</span>
+                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Rating</span>
+                                </div>
                             </div>
-                            <div className="w-px h-8 bg-slate-200"></div>
-                            <div className="text-xs font-bold text-slate-600">
-                                {doctor.patients}+ <span className="text-slate-400 font-medium">Pacientes</span>
+                            <div className="w-px h-8 bg-slate-200/50"></div>
+                            <div className="text-right">
+                                <span className="font-bold text-slate-800 block leading-none">{doctor.patients}+</span>
+                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pacientes</span>
                             </div>
                         </div>
 
                         {/* Availability & Action */}
-                        <div className="space-y-4">
-                            <div className="flex items-center gap-2 text-xs font-bold text-teal-600 bg-teal-50 px-3 py-2 rounded-lg border border-teal-100/50">
-                                <Clock size={14} />
-                                Disponible: {doctor.availability}
+                        <div className="space-y-5">
+                            <div className="flex items-center gap-2.5 text-xs font-bold text-teal-700 bg-teal-50/80 px-4 py-3 rounded-xl border border-teal-100/50">
+                                <Clock size={16} className="text-teal-500" />
+                                <span className="truncate">Disponible: {doctor.availability}</span>
                             </div>
 
                             <Button
-                                className="w-full bg-slate-900 hover:bg-teal-600 text-white rounded-xl py-6 shadow-lg shadow-slate-900/10 group-hover:shadow-teal-500/20 transition-all font-bold flex items-center justify-between px-6"
+                                className="w-full bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-2xl py-6 shadow-lg shadow-teal-500/20 hover:shadow-teal-500/40 active:scale-[0.98] transition-all duration-300 font-bold flex items-center justify-between px-6 border border-teal-400/20"
                                 onClick={() => handleBook(doctor.specialty)}
                             >
                                 Reservar Cita
-                                <div className="bg-white/20 p-1 rounded-full">
-                                    <ChevronRight size={16} />
+                                <div className="bg-white/20 p-1.5 rounded-full backdrop-blur-sm">
+                                    <ArrowRight size={16} strokeWidth={2.5} />
                                 </div>
                             </Button>
                         </div>

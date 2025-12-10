@@ -16,8 +16,8 @@ export const Home: React.FC = () => {
             setActiveDni(active);
 
             // Get Patient Name
-            const { data: patient } = await import('../../infrastructure/db/client').then(m => m.supabaseClient.from('patients').select('first_name, id').eq('dni', active).single());
-            if (patient) setPatientName(patient.first_name);
+            const { data: patient } = await import('../../infrastructure/db/client').then(m => m.supabaseClient.from('patients').select('first_name, last_name, id').eq('dni', active).single());
+            if (patient) setPatientName(`${patient.first_name} ${patient.last_name}`);
 
             // Get Family for Widget (only if main user)
             if (active === '12345678' && patient) {
@@ -46,7 +46,7 @@ export const Home: React.FC = () => {
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-4xl md:text-5xl font-light text-slate-800 tracking-tight">
-                            Hola, <span className="font-bold text-teal-700">{patientName}</span>
+                            Hola, <span className="font-bold text-teal-700 capitalize">{patientName.toLowerCase()}</span>
                         </h1>
                         <p className="text-slate-500 font-medium mt-2 text-lg">¿Cómo te sientes hoy?</p>
                     </div>

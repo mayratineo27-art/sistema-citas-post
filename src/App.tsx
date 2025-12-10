@@ -11,7 +11,7 @@ import { BookingSpecialties } from './presentation/client/BookingSpecialties';
 import { BookingServices } from './presentation/client/BookingServices';
 import { BookingSlots } from './presentation/client/BookingSlots';
 import { BookingConfirmation } from './presentation/client/BookingConfirmation';
-import { TestPage } from './TestPage';
+{/* Test Page Removed */ }
 
 import { Recetas } from './presentation/client/Recetas';
 import { Historial } from './presentation/client/Historial';
@@ -24,12 +24,13 @@ function App() {
         <Router>
             <Routes>
                 {/* 1. Route to verify React works */}
-                <Route path="/test" element={<TestPage />} />
+                {/* Route removed */}
 
                 {/* 2. Client Portal Routes */}
                 <Route path="/cliente" element={<ClientLayout />}>
                     <Route index element={<ClientHome />} />
                     <Route path="home" element={<ClientHome />} />
+                    <Route path="dashboard" element={<ClientHome />} />
                     <Route path="medicos" element={<ClientMedicos />} />
                     <Route path="citas" element={<ClientCitas />} />
                     {/* Booking Routes */}

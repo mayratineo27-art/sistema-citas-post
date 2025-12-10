@@ -28,6 +28,11 @@ export const BookingConfirmation: React.FC = () => {
     const date = searchParams.get('date') || new Date().toISOString().split('T')[0];
     const time = searchParams.get('time') || '08:00 AM';
 
+    // Fix Date Timezone Issue: Parse manually to ensure Local Time
+    const [year, month, day] = date.split('-').map(Number);
+    // Create date focusing on noon to avoid any edge case offsets, though for just display, manual formatting is safest.
+    const displayDateObj = new Date(year, month - 1, day);
+
     const [loading, setLoading] = useState(false);
     const [patientId, setPatientId] = useState<string | null>(null);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -200,73 +205,73 @@ export const BookingConfirmation: React.FC = () => {
                 <h1 className="text-xl font-bold text-slate-800">Confirmar Cita</h1>
             </div>
 
-            {/* LEFT COLUMN: Patient Card */}
+            {/* LEFT COLUMN: Patient Card (REDESIGNED LIGHT) */}
             <div className="lg:w-1/2 space-y-6">
                 {/* Step Indicator */}
                 <div className="hidden lg:flex items-center gap-3 mb-2">
                     <button onClick={() => navigate(-1)} className="p-2 hover:bg-slate-100 rounded-full transition-colors text-slate-400 hover:text-slate-800">
                         <ChevronLeft size={24} />
                     </button>
-                    <div className="bg-slate-900 text-white px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase">
+                    <div className="bg-teal-600 text-white px-4 py-2 rounded-full text-xs font-bold tracking-widest uppercase shadow-lg shadow-teal-500/20">
                         Paso Final
                     </div>
                     <span className="text-slate-400 font-medium">Verificación de Datos</span>
                 </div>
 
-                <div className="glass-card rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border border-white/60 relative">
-                    {/* ID Header */}
-                    <div className="bg-slate-900 p-8 text-white relative overflow-hidden">
+                <div className="bg-white/80 backdrop-blur-xl rounded-[2.5rem] overflow-hidden shadow-2xl shadow-slate-200/50 border border-white/60 relative group hover:shadow-teal-100 transition-all duration-500">
+                    {/* ID Header - Light Gradient */}
+                    <div className="bg-gradient-to-br from-slate-50 to-white p-8 relative overflow-hidden border-b border-slate-100">
                         <div className="absolute top-0 right-0 p-8 opacity-5">
-                            <User size={150} />
+                            <User size={150} className="text-teal-900" />
                         </div>
                         <div className="relative z-10">
-                            <h2 className="text-xs font-bold text-slate-400 uppercase tracking-[0.2em] mb-4">Titular de la Cita</h2>
+                            <h2 className="text-xs font-bold text-teal-600 uppercase tracking-[0.2em] mb-4">Titular de la Cita</h2>
                             <div className="flex items-center gap-6">
-                                <div className="w-20 h-20 bg-white/10 backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl font-light border border-white/20">
+                                <div className="w-20 h-20 bg-teal-50 rounded-2xl flex items-center justify-center text-3xl font-bold text-teal-700 border border-teal-100 shadow-sm">
                                     {patient.firstName[0]}
                                 </div>
                                 <div>
-                                    <h3 className="text-2xl font-bold">{patient.firstName}</h3>
-                                    <p className="text-slate-400 text-lg font-light">{patient.lastName}</p>
+                                    <h3 className="text-2xl font-black text-slate-800 capitalize">{patient.firstName.toLowerCase()}</h3>
+                                    <p className="text-slate-500 text-lg font-medium capitalize">{patient.lastName.toLowerCase()}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     {/* Data Grid */}
-                    <div className="p-8 bg-white/50 backdrop-blur-3xl space-y-6">
+                    <div className="p-8 space-y-6">
                         <div className="grid grid-cols-2 gap-6">
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">DNI</label>
-                                <div className="font-bold text-slate-700 bg-white border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
+                                <div className="font-bold text-slate-700 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
                                     <Shield size={14} className="text-teal-500" /> {patient.dni || '...'}
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Seguro</label>
-                                <div className="font-bold text-slate-700 bg-white border border-slate-100 px-3 py-2 rounded-xl">
+                                <div className="font-bold text-slate-700 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
                                     {patient.insurance}
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Sede</label>
-                                <div className="font-bold text-slate-700 bg-white border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
+                                <div className="font-bold text-slate-700 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl flex items-center gap-2">
                                     <MapPin size={14} className="text-red-500" /> Central
                                 </div>
                             </div>
                             <div className="space-y-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Edad</label>
-                                <div className="font-bold text-slate-700 bg-white border border-slate-100 px-3 py-2 rounded-xl">
+                                <div className="font-bold text-slate-700 bg-slate-50 border border-slate-100 px-3 py-2 rounded-xl">
                                     {patient.age} años
                                 </div>
                             </div>
                         </div>
 
-                        <div className="pt-4 border-t border-slate-200/50">
+                        <div className="pt-4 border-t border-slate-100">
                             <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 flex gap-3">
                                 <AlertCircle size={20} className="text-amber-600 shrink-0 mt-0.5" />
-                                <p className="text-xs text-amber-800 leading-relaxed font-medium">
-                                    Verifica que los datos sean correctos. El ticket se generará a nombre de este paciente.
+                                <p className="text-xs text-amber-800 leading-relaxed font-bold">
+                                    IMPORTANTE: Acude 30 minutos antes para pasar por Triaje y signos vitales.
                                 </p>
                             </div>
                         </div>
@@ -276,7 +281,9 @@ export const BookingConfirmation: React.FC = () => {
 
             {/* RIGHT COLUMN: Ticket Preview */}
             <div className="lg:w-1/2">
-                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-teal-900/10 border border-teal-100 overflow-hidden relative group hover:-translate-y-1 transition-all duration-500">
+                <div className="bg-white rounded-[2.5rem] shadow-2xl shadow-teal-900/10 border border-teal-100 overflow-hidden relative group hover:-translate-y-1 transition-all duration-500"
+                    style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/cream-paper.png")' }}>
+
                     {/* Decorative Top */}
                     <div className="h-4 bg-gradient-to-r from-teal-400 via-emerald-400 to-teal-500"></div>
 
@@ -284,7 +291,7 @@ export const BookingConfirmation: React.FC = () => {
                         <div className="flex justify-between items-start mb-8">
                             <div>
                                 <h2 className="text-xs font-black text-teal-600 uppercase tracking-widest mb-2">Nueva Reserva</h2>
-                                <h3 className="text-3xl font-black text-slate-900 leading-none">{specialtyName}</h3>
+                                <h3 className="text-3xl font-black text-slate-900 leading-none capitalize">{specialtyName.toLowerCase()}</h3>
                             </div>
                             <div className="w-12 h-12 bg-teal-50 rounded-2xl flex items-center justify-center text-teal-600">
                                 <Calendar size={24} strokeWidth={2} />
@@ -292,23 +299,25 @@ export const BookingConfirmation: React.FC = () => {
                         </div>
 
                         <div className="space-y-6">
-                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <div className="bg-white p-3 rounded-xl shadow-sm text-slate-900">
+                            <div className="flex items-center gap-4 bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-slate-200 shadow-sm">
+                                <div className="bg-teal-50 p-3 rounded-xl text-teal-700">
                                     <Calendar size={24} />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-slate-400 uppercase">Fecha Programada</p>
-                                    <p className="text-xl font-bold text-slate-800">{new Date(date).toLocaleDateString(undefined, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                                    <p className="text-xl font-black text-slate-800 capitalize">
+                                        {displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+                                    </p>
                                 </div>
                             </div>
 
-                            <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                                <div className="bg-white p-3 rounded-xl shadow-sm text-slate-900">
+                            <div className="flex items-center gap-4 bg-white/60 backdrop-blur-sm p-4 rounded-2xl border border-slate-200 shadow-sm">
+                                <div className="bg-teal-50 p-3 rounded-xl text-teal-700">
                                     <Clock size={24} />
                                 </div>
                                 <div>
                                     <p className="text-xs font-bold text-slate-400 uppercase">Hora Estimada</p>
-                                    <p className="text-xl font-bold text-slate-800">{time}</p>
+                                    <p className="text-xl font-black text-slate-800">{time}</p>
                                 </div>
                             </div>
                         </div>
@@ -332,8 +341,8 @@ export const BookingConfirmation: React.FC = () => {
                     </div>
 
                     {/* Ticket Cutout Effect */}
-                    <div className="absolute top-1/2 -left-3 w-6 h-6 bg-medical-pattern rounded-full"></div>
-                    <div className="absolute top-1/2 -right-3 w-6 h-6 bg-medical-pattern rounded-full"></div>
+                    <div className="absolute top-1/2 -left-3 w-6 h-6 bg-medical-pattern rounded-full shadow-inner border-r border-slate-200"></div>
+                    <div className="absolute top-1/2 -right-3 w-6 h-6 bg-medical-pattern rounded-full shadow-inner border-l border-slate-200"></div>
                 </div>
             </div>
         </div>

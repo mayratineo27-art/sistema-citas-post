@@ -253,21 +253,41 @@ export const Perfil: React.FC = () => {
 
                             <div className="space-y-3 mb-6 relative z-10">
                                 {children.map(child => (
-                                    <div key={child.id} className="flex items-center gap-3 p-3 bg-white/80 rounded-xl hover:bg-white transition-all cursor-pointer border border-transparent hover:border-purple-100 shadow-sm hover:shadow-md group">
-                                        <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-xs border border-purple-200 group-hover:scale-105 transition-transform">
-                                            {child.first_name[0]}{child.last_name[0]}
+                                    <div key={child.id} className="flex items-center gap-3 p-3 bg-white/80 rounded-xl transition-all border border-transparent hover:border-purple-100 shadow-sm hover:shadow-md group relative">
+                                        <div
+                                            className="flex-1 flex items-center gap-3 cursor-pointer"
+                                            onClick={() => window.location.href = '/cliente/familiares'}
+                                        >
+                                            <div className="w-10 h-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center font-bold text-xs border border-purple-200 group-hover:scale-105 transition-transform">
+                                                {child.first_name[0]}{child.last_name[0]}
+                                            </div>
+                                            <div className="min-w-0">
+                                                <p className="text-sm font-bold text-slate-700 group-hover:text-purple-700 truncate transition-colors">{child.first_name} {child.last_name}</p>
+                                                <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Hijo/a • {new Date().getFullYear() - new Date(child.birth_date).getFullYear()} años</p>
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-bold text-slate-700 group-hover:text-purple-700 truncate transition-colors">{child.first_name} {child.last_name}</p>
-                                            <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">Hijo/a • {new Date().getFullYear() - new Date(child.birth_date).getFullYear()} años</p>
-                                        </div>
-                                        <ChevronRight size={16} className="text-slate-300 group-hover:text-purple-400" />
+
+                                        {/* Quick Book Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                localStorage.setItem('activePatientDni', child.dni);
+                                                window.location.href = '/cliente/reservar';
+                                            }}
+                                            className="bg-white hover:bg-purple-50 text-purple-400 hover:text-purple-600 border border-slate-100 hover:border-purple-200 p-2 rounded-lg shadow-sm hover:shadow transition-all"
+                                            title="Agendar cita para este familiar"
+                                        >
+                                            <Calendar size={18} />
+                                        </button>
                                     </div>
                                 ))}
                             </div>
 
-                            <Button onClick={() => window.location.href = '/cliente/familiares'} className="relative z-10 w-full border border-dashed border-slate-300 bg-transparent text-slate-500 hover:border-purple-400 hover:text-purple-600 hover:bg-purple-50 rounded-xl py-3 text-sm font-bold transition-all flex items-center justify-center gap-2">
-                                <PlusCircle size={16} />
+                            <Button
+                                onClick={() => window.location.href = '/cliente/familiares'}
+                                className="relative z-10 w-full bg-purple-600 hover:bg-purple-700 text-white shadow-lg shadow-purple-500/20 rounded-xl py-3 text-sm font-bold transition-all flex items-center justify-center gap-2 hover:-translate-y-0.5"
+                            >
+                                <Users size={18} />
                                 Gestionar Familia
                             </Button>
                         </div>
