@@ -34,9 +34,10 @@ export const Historial: React.FC = () => {
                         lastname,
                         specialties (name)
                     ),
-                    details (
+                    medical_history (
                         diagnosis,
-                        treatment
+                        treatment,
+                        notes
                     )
                 `)
                 .eq('patient_id', patient.id)

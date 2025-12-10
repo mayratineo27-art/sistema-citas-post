@@ -58,7 +58,7 @@ async function seed() {
 
     if (appt) {
         // Prescription
-        await supabase.from('details').insert({
+        await supabase.from('medical_history').insert({
             appointment_id: appt.id,
             diagnosis: 'Niño Sano',
             treatment: 'Sulfato Ferroso 5 gotas al día.',

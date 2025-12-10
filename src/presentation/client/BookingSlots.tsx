@@ -9,8 +9,14 @@ export const BookingSlots: React.FC = () => {
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
 
     // Mock Slots Data
-    const morningSlots = ['08:00 AM', '08:30 AM', '09:00 AM', '09:30 AM', '10:00 AM', '10:30 AM', '11:00 AM'];
-    const afternoonSlots = ['02:00 PM', '02:30 PM', '03:00 PM', '04:00 PM'];
+    // Mock Slots Data (Updated: 7:30 AM Start, 2-3 PM Break, 7 PM End)
+    const morningSlots = [
+        '07:30 AM', '08:00 AM', '08:30 AM', '09:00 AM', '09:30 AM',
+        '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM', '01:00 PM', '01:30 PM'
+    ];
+    const afternoonSlots = [
+        '03:00 PM', '03:30 PM', '04:00 PM', '04:30 PM', '05:00 PM', '05:30 PM', '06:00 PM', '06:30 PM'
+    ];
 
     const handleConfirm = () => {
         // Navigate to confirmation page with params

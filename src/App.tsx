@@ -11,7 +11,7 @@ import { BookingSpecialties } from './presentation/client/BookingSpecialties';
 import { BookingServices } from './presentation/client/BookingServices';
 import { BookingSlots } from './presentation/client/BookingSlots';
 import { BookingConfirmation } from './presentation/client/BookingConfirmation';
-{/* Test Page Removed */ }
+import { LoginPage } from './presentation/pages/LoginPage';
 
 import { Recetas } from './presentation/client/Recetas';
 import { Historial } from './presentation/client/Historial';
@@ -23,8 +23,8 @@ function App() {
     return (
         <Router>
             <Routes>
-                {/* 1. Route to verify React works */}
-                {/* Route removed */}
+                {/* 1. Public Routes */}
+                <Route path="/login" element={<LoginPage />} />
 
                 {/* 2. Client Portal Routes */}
                 <Route path="/cliente" element={<ClientLayout />}>

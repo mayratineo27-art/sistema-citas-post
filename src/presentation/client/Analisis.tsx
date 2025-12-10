@@ -395,6 +395,34 @@ export const Analisis: React.FC = () => {
                                         {test.status === 'READY' && (
                                             <Button
                                                 variant="primary"
+                                                onClick={() => {
+                                                    // Generate Mock PDF
+                                                    const content = `
+                                                        RESULTADOS DE LABORATORIO - CITAMEDIC
+                                                        =====================================
+                                                        Paciente: ${localStorage.getItem('activePatientDni') || '12345678'}
+                                                        Examen: ${test.test_name}
+                                                        Fecha: ${test.test_date}
+                                                        Doctor: ${test.doctor_name}
+                                                        -------------------------------------
+                                                        Estado: COMPLETADO
+                                                        
+                                                        Valores:
+                                                        - Parametro 1: Normal
+                                                        - Parametro 2: Normal
+                                                        
+                                                        Nota: Este es un documento simulado para demostración.
+                                                    `;
+                                                    const blob = new Blob([content], { type: 'text/plain' });
+                                                    const url = window.URL.createObjectURL(blob);
+                                                    const a = document.createElement('a');
+                                                    a.href = url;
+                                                    a.download = `Resultado_${test.test_name.replace(/\s/g, '_')}.txt`; // Using .txt for simplicity without heavy libs
+                                                    document.body.appendChild(a);
+                                                    a.click();
+                                                    window.URL.revokeObjectURL(url);
+                                                    document.body.removeChild(a);
+                                                }}
                                                 className="bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 shadow-lg shadow-teal-500/30"
                                             >
                                                 <Download size={18} className="mr-2" />

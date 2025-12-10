@@ -20,7 +20,7 @@ export const Recetas: React.FC = () => {
                     setPatientData(pData);
 
                     const { data, error } = await supabaseClient
-                        .from('details')
+                        .from('medical_history')
                         .select(`
                             id, treatment, diagnosis, notes, created_at,
                             appointments!inner (
@@ -45,6 +45,10 @@ export const Recetas: React.FC = () => {
         };
 
         fetchRecetas();
+
+        // Listen for storage changes just in case
+        window.addEventListener('storage', fetchRecetas);
+        return () => window.removeEventListener('storage', fetchRecetas);
     }, []);
 
     const filteredRecetas = recetas.filter((r: any) => {
@@ -240,7 +244,14 @@ export const Recetas: React.FC = () => {
                 )}
 
                 {selectedReceta && (
-                    <div className="absolute top-8 right-8 z-30">
+                    <div className="absolute top-8 right-8 z-30 flex gap-2">
+                        <button
+                            onClick={() => alert("Simulando descarga de resultados de análisis (PDF)...")}
+                            className="bg-white hover:bg-slate-50 text-teal-700 border border-teal-200 shadow-lg shadow-teal-500/10 rounded-full p-3 transition-transform hover:scale-105 active:scale-95 flex items-center gap-2 font-bold text-sm px-5"
+                        >
+                            <FileText size={18} />
+                            <span className="hidden md:inline">Descargar Análisis</span>
+                        </button>
                         <button
                             onClick={() => window.print()}
                             className="bg-teal-600 hover:bg-teal-700 text-white shadow-lg shadow-teal-500/30 rounded-full p-3 transition-transform hover:scale-105 active:scale-95 flex items-center gap-2 font-bold text-sm px-5"
